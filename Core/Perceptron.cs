@@ -37,15 +37,17 @@ public class Perceptron<TScalar> where TScalar : struct, IBinaryFloatingPointIee
     /// </summary>
     /// <param name="inputBatch">The collection of input values.</param>
     /// <param name="outputBatch">The expected output values for each input.</param>
-    /// <param name="learningRate">The speed of learning which effects the changes on weights and bias, must be between 0.0 and 1.0 inclusively.</param>
-    /// <param name="epochs">The number of complete passes through the entire dataset, must be greater than 0.</param>
+    /// <param name="learningRate">
+    /// The speed of learning which affects the changes on weights and bias.
+    /// Any positive value is accepted but typically has a value between 0.0 and 1.0 inclusively.
+    /// </param>
+    /// <param name="epochs">The number of complete passes through the entire dataset.</param>
     /// <exception cref="ArgumentOutOfRangeException"/>
     public void Train(ReadOnlySpan<TScalar[]> inputBatch, ReadOnlySpan<TScalar> outputBatch, TScalar learningRate, int epochs)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThan(learningRate, TScalar.Zero);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(learningRate, TScalar.One);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(epochs);
         ArgumentOutOfRangeException.ThrowIfNotEqual(inputBatch.Length, outputBatch.Length);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(learningRate);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(epochs);
 
         int losses = 1;
         Span<int> indices = Enumerable.Range(0, inputBatch.Length).ToArray();
