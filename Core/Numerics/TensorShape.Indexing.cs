@@ -134,10 +134,12 @@ public readonly partial struct TensorShape
             ArgumentOutOfRangeException.ThrowIfNegative(index);
             ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, length);
 
-            linearIndex = checked(linearIndex + index * stride);
+            linearIndex = checked(linearIndex + stride * index);
         }
 
-        linearIndex = checked(linearIndex + indices[0] * strides[0]);
+        ArgumentOutOfRangeException.ThrowIfNegative(indices[0]);
+        linearIndex = checked(linearIndex + strides[0] * indices[0]);
+
         if (linearIndex >= ElementCount)
         {
             throw new ArgumentException($"{nameof(indices)} points to out of range of elements.");
@@ -150,7 +152,7 @@ public readonly partial struct TensorShape
     /// <remarks>
     /// This method does not checks for bounds for performance, so use it with caution.
     /// </remarks>
-    public readonly int ComputeLinearIndexUnchecked(scoped ReadOnlySpan<int> indices)
+    public readonly int ComputeLinearIndexUnchecked(params scoped ReadOnlySpan<int> indices)
     {
         ReadOnlySpan<int> strides = Strides[^indices.Length..];
 
@@ -158,7 +160,10 @@ public readonly partial struct TensorShape
 
         for (int dimension = indices.Length - 1; dimension >= 0; --dimension)
         {
-            linearIndex += indices[dimension] * strides[dimension];
+            int stride = strides[dimension];
+            int index = indices[dimension];
+
+            linearIndex += stride * index;
         }
 
         return linearIndex;
