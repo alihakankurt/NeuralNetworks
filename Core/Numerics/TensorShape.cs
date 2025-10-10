@@ -150,10 +150,9 @@ public readonly partial struct TensorShape : IEquatable<TensorShape>
     /// <inheritdoc cref="TensorShape.Create(ReadOnlySpan{int})" path="/remarks"/>
     public static TensorShape Create(in TensorShape shape, ReadOnlySpan<Range> ranges, out int linearOffset)
     {
-        ArgumentOutOfRangeException.ThrowIfZero(ranges.Length);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(ranges.Length, shape.Rank);
+        ArgumentOutOfRangeException.ThrowIfNotEqual(ranges.Length, shape.Rank);
 
-        int rank = ranges.Length;
+        int rank = shape.Rank;
         ReadOnlySpan<int> lengths = shape.Lengths;
         ReadOnlySpan<int> strides = shape.Strides;
 
