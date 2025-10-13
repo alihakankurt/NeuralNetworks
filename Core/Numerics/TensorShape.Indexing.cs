@@ -117,15 +117,14 @@ public readonly partial struct TensorShape
     /// <exception cref="ArgumentOutOfRangeException"/>
     public readonly int ComputeLinearIndex(params ReadOnlySpan<int> indices)
     {
-        ArgumentOutOfRangeException.ThrowIfZero(indices.Length);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(indices.Length, Rank);
+        ArgumentOutOfRangeException.ThrowIfNotEqual(indices.Length, Rank);
 
-        ReadOnlySpan<int> lengths = Lengths[^indices.Length..];
-        ReadOnlySpan<int> strides = Strides[^indices.Length..];
+        ReadOnlySpan<int> lengths = Lengths;
+        ReadOnlySpan<int> strides = Strides;
 
         int linearIndex = 0;
 
-        for (int dimension = indices.Length - 1; dimension > 0; --dimension)
+        for (int dimension = Rank - 1; dimension >= 0; --dimension)
         {
             int length = lengths[dimension];
             int stride = strides[dimension];
@@ -135,14 +134,6 @@ public readonly partial struct TensorShape
             ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, length);
 
             linearIndex = checked(linearIndex + stride * index);
-        }
-
-        ArgumentOutOfRangeException.ThrowIfNegative(indices[0]);
-        linearIndex = checked(linearIndex + strides[0] * indices[0]);
-
-        if (linearIndex >= ElementCount)
-        {
-            throw new ArgumentException($"{nameof(indices)} points to out of range of elements.");
         }
 
         return linearIndex;

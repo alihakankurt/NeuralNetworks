@@ -117,14 +117,14 @@ public sealed partial class TensorShapeTests
     }
 
     [Test]
-    public async ValueTask ComputeLinearIndex_WithValidIndices_OfLengthLessThanRank_ShouldComputeCorrectly()
+    public async ValueTask ComputeLinearIndex_WithValidIndices_OfLengthNotEqualToRank_ShouldThrow()
     {
         int[] indices = [5, 4];
         var shape = TensorShape.Create(2, 3, 5);
 
-        int linearIndex = shape.ComputeLinearIndex(indices);
+        var unit = () => shape.ComputeLinearIndex(indices);
 
-        await Assert.That(linearIndex).IsEqualTo(shape.ElementCount - 1);
+        await Assert.That(unit).ThrowsException();
     }
 
     [Test]
