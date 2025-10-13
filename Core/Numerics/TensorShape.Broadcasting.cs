@@ -67,6 +67,39 @@ public readonly partial struct TensorShape
     }
 
     /// <summary>
+    /// Checkes whether current shape is broadcastable to the <paramref name="other"/>.
+    /// </summary>
+    /// <param name="other">The other shape.</param>
+    /// <returns><see langword="true"/> if current shape was broadcastable to other one; <see langword="false"/> otherwise.</returns>
+    public readonly bool IsBroadcastableTo(in TensorShape other)
+    {
+        int rank = Rank;
+        int broadcastRank = other.Rank;
+        int rankDelta = broadcastRank - rank;
+
+        if (rankDelta < 0)
+        {
+            return false;
+        }
+
+        ReadOnlySpan<int> lengths = Lengths;
+        ReadOnlySpan<int> broadcastLengths = other.Lengths;
+
+        for (int dimension = rank - 1; dimension >= 0; --dimension)
+        {
+            int length = lengths[dimension];
+            int broadcastLength = broadcastLengths[dimension + rankDelta];
+
+            if (length != broadcastLength && length != 1)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
     /// Computes the linear indices of shapes respective to the specified <paramref name="indices"/> for the broadcasted shape.
     /// </summary>
     /// <param name="shape1">The first shape.</param>

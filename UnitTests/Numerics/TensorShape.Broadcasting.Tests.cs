@@ -36,6 +36,28 @@ public sealed partial class TensorShapeTests
     }
 
     [Test]
+    public async ValueTask IsBroadcastableTo_WithCompatibleShapes_ShouldSuccess()
+    {
+        var shape1 = TensorShape.Create(2, 3, 5);
+        var shape2 = TensorShape.Create(3, 1);
+
+        bool isBroadcastable = shape2.IsBroadcastableTo(shape1);
+
+        await Assert.That(isBroadcastable).IsTrue();
+    }
+
+    [Test]
+    public async ValueTask IsBroadcastableTo_WithIncompatibleShapes_ShouldFail()
+    {
+        var shape1 = TensorShape.Create(2, 3, 7);
+        var shape2 = TensorShape.Create(1, 3, 5);
+
+        bool isBroadcastable = shape2.IsBroadcastableTo(shape1);
+
+        await Assert.That(isBroadcastable).IsFalse();
+    }
+
+    [Test]
     public async ValueTask ComputeBroadcastIndices_WithShapesAndIndices_ShouldCompute()
     {
         var shape1 = TensorShape.Create(2, 3, 1);
