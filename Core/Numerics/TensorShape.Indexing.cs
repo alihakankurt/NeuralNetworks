@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace NeuralNetworks.Core.Numerics;
 
 public readonly partial struct TensorShape
@@ -6,7 +8,7 @@ public readonly partial struct TensorShape
     /// Initializes the <paramref name="indices"/> for a forward iteration.
     /// </summary>
     /// <param name="indices">The multi-dimensional indices.</param>
-    /// <remarks>The length of the <paramref name="indices"/> should be same as rank of the shape.</remarks>
+    /// <exception cref="ArgumentOutOfRangeException"/>
     public static void InitializeForwardIndexing(Span<int> indices)
     {
         ArgumentOutOfRangeException.ThrowIfZero(indices.Length);
@@ -18,9 +20,9 @@ public readonly partial struct TensorShape
     /// <summary>
     /// Initializes the <paramref name="indices"/> for a backward iteration.
     /// </summary>
-    /// <param name="lengths">The lengths of the elements.</param>
-    /// <inheritdoc cref="InitializeForwardIndexing(Span{int})" path="/param[@name='indices']"/>
-    /// <inheritdoc cref="InitializeForwardIndexing(Span{int})" path="/remarks"/>
+    /// <param name="lengths">The lengths in each dimension.</param>
+    /// <param name="indices">The multi-dimensional indices.</param>
+    /// <exception cref="ArgumentOutOfRangeException"/>
     public static void InitializeBackwardIndexing(ReadOnlySpan<int> lengths, Span<int> indices)
     {
         ArgumentOutOfRangeException.ThrowIfNotEqual(indices.Length, lengths.Length);
@@ -66,6 +68,7 @@ public readonly partial struct TensorShape
     /// Moves to the next linear index by incrementing the <paramref name="indices"/> according to the <see cref="TensorShape.Lengths"/>.
     /// </summary>
     /// <inheritdoc cref="MoveToNextIndex(ReadOnlySpan{int}, Span{int})"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly bool MoveToNextIndex(Span<int> indices)
     {
         return TensorShape.MoveToNextIndex(Lengths, indices);
@@ -104,6 +107,7 @@ public readonly partial struct TensorShape
     /// Moves to the next linear index by decrementing the <paramref name="indices"/> according to the <see cref="TensorShape.Lengths"/>.
     /// </summary>
     /// <inheritdoc cref="MoveToPreviousIndex(ReadOnlySpan{int}, Span{int})"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly bool MoveToPreviousIndex(Span<int> indices)
     {
         return TensorShape.MoveToPreviousIndex(Lengths, indices);
@@ -143,6 +147,7 @@ public readonly partial struct TensorShape
     /// <remarks>
     /// This method does not checks for bounds for performance, so use it with caution.
     /// </remarks>
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public readonly int ComputeLinearIndexUnchecked(params scoped ReadOnlySpan<int> indices)
     {
         ReadOnlySpan<int> strides = Strides[^indices.Length..];

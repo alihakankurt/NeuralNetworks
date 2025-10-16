@@ -12,7 +12,7 @@ public static partial class Tensor
     /// <param name="shape">The multi-dimensional shape.</param>
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
     public static Tensor<TScalar> Create<TScalar>(TensorShape shape)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         TScalar[] storage = [];
         int elementCount = shape.ElementCount;
@@ -33,7 +33,7 @@ public static partial class Tensor
     /// <param name="value">The value to initialize storage.</param>
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
     public static Tensor<TScalar> Create<TScalar>(TensorShape shape, TScalar value)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         TScalar[] storage = [];
         int elementCount = shape.ElementCount;
@@ -54,7 +54,7 @@ public static partial class Tensor
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Tensor<TScalar> Create<TScalar>(ReadOnlySpan<int> lengths)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         var shape = TensorShape.Create(lengths);
         return Tensor.Create<TScalar>(shape);
@@ -69,7 +69,7 @@ public static partial class Tensor
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Tensor<TScalar> Create<TScalar>(ReadOnlySpan<int> lengths, TScalar value)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         var shape = TensorShape.Create(lengths);
         return Tensor.Create<TScalar>(shape, value);
@@ -80,7 +80,7 @@ public static partial class Tensor
     /// </summary>
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/> as clone</returns>
     public static Tensor<TScalar> Clone<TScalar>(this Tensor<TScalar> tensor)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         TensorShape shape = tensor.Shape;
         TScalar[] storage = [];

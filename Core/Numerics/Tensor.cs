@@ -7,7 +7,7 @@ namespace NeuralNetworks.Core.Numerics;
 /// </summary>
 /// <inheritdoc cref="ITensor{TScalar}" path="/typeparam"/>
 public sealed class Tensor<TScalar> : ITensor<TScalar>
-    where TScalar : struct, INumberBase<TScalar>
+    where TScalar : struct, INumber<TScalar>
 {
     private readonly TensorShape _shape;
     private readonly TScalar[] _storage;

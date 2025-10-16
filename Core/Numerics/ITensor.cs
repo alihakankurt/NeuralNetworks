@@ -7,7 +7,7 @@ namespace NeuralNetworks.Core.Numerics;
 /// </summary>
 /// <typeparam name="TScalar">The type of the numerical data.</typeparam>
 public interface ITensor<TScalar>
-    where TScalar : struct, INumberBase<TScalar>
+    where TScalar : struct, INumber<TScalar>
 {
     /// <summary>Gets the shape in the multi-dimensional space..</summary>
     TensorShape Shape { get; }

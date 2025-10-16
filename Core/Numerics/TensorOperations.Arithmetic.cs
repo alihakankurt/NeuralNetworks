@@ -12,7 +12,7 @@ public static partial class Tensor
     /// <returns>The sum of the elements.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static TScalar Sum<TScalar>(this Tensor<TScalar> tensor)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         return Sum(tensor.AsSpan());
     }
@@ -24,7 +24,7 @@ public static partial class Tensor
     /// <returns>The sum of the elements.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static TScalar Sum<TScalar>(this in TensorSpan<TScalar> span)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         CumulativeOperation<TScalar> op = static (acc, e) => acc + e;
         return Accumulate<TScalar>(span, op, TScalar.AdditiveIdentity);
@@ -37,7 +37,7 @@ public static partial class Tensor
     /// <returns>The product of the elements.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static TScalar Product<TScalar>(this Tensor<TScalar> tensor)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         return Product(tensor.AsSpan());
     }
@@ -49,7 +49,7 @@ public static partial class Tensor
     /// <returns>The product of the elements.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static TScalar Product<TScalar>(this in TensorSpan<TScalar> span)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         CumulativeOperation<TScalar> op = static (acc, e) => acc * e;
         return Accumulate<TScalar>(span, op, TScalar.MultiplicativeIdentity);
@@ -61,7 +61,7 @@ public static partial class Tensor
     /// <param name="tensor">The tensor.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static void Negate<TScalar>(this Tensor<TScalar> tensor)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         Negate(tensor.AsSpan());
     }
@@ -72,7 +72,7 @@ public static partial class Tensor
     /// <param name="span">The tensor span.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static void Negate<TScalar>(this in TensorSpan<TScalar> span)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         UnaryOperation<TScalar> op = static (e) => -e;
         ExecuteIn<TScalar>(span, op);
@@ -85,7 +85,7 @@ public static partial class Tensor
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static Tensor<TScalar> NegateTo<TScalar>(this Tensor<TScalar> tensor)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         return NegateTo(tensor.AsSpan());
     }
@@ -97,7 +97,7 @@ public static partial class Tensor
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static Tensor<TScalar> NegateTo<TScalar>(this in TensorSpan<TScalar> span)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         UnaryOperation<TScalar> op = static (e) => -e;
         return Execute<TScalar>(span, op);
@@ -110,7 +110,7 @@ public static partial class Tensor
     /// <param name="right">The tensor to add.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static void Add<TScalar>(this Tensor<TScalar> left, Tensor<TScalar> right)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         Add(left.AsSpan(), right.AsSpan());
     }
@@ -122,7 +122,7 @@ public static partial class Tensor
     /// <param name="right">The tensor span to add.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static void Add<TScalar>(this in TensorSpan<TScalar> left, in TensorSpan<TScalar> right)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         BinaryOperation<TScalar> op = static (e1, e2) => e1 + e2;
         ExecuteIn<TScalar>(left, right, op);
@@ -136,7 +136,7 @@ public static partial class Tensor
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static Tensor<TScalar> AddTo<TScalar>(Tensor<TScalar> left, Tensor<TScalar> right)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         return AddTo(left.AsSpan(), right.AsSpan());
     }
@@ -149,7 +149,7 @@ public static partial class Tensor
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static Tensor<TScalar> AddTo<TScalar>(in TensorSpan<TScalar> left, in TensorSpan<TScalar> right)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         BinaryOperation<TScalar> op = static (e1, e2) => e1 + e2;
         return Execute<TScalar>(left, right, op);
@@ -162,7 +162,7 @@ public static partial class Tensor
     /// <param name="tensor2">The tensor to subtract.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static void Subtract<TScalar>(Tensor<TScalar> tensor1, Tensor<TScalar> tensor2)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         Subtract(tensor1.AsSpan(), tensor2.AsSpan());
     }
@@ -174,7 +174,7 @@ public static partial class Tensor
     /// <param name="span2">The tensor span to subtract.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static void Subtract<TScalar>(in TensorSpan<TScalar> span1, in TensorSpan<TScalar> span2)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         BinaryOperation<TScalar> op = static (e1, e2) => e1 - e2;
         ExecuteIn<TScalar>(span1, span2, op);
@@ -188,7 +188,7 @@ public static partial class Tensor
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static Tensor<TScalar> SubtractTo<TScalar>(Tensor<TScalar> tensor1, Tensor<TScalar> tensor2)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         return SubtractTo(tensor1.AsSpan(), tensor2.AsSpan());
     }
@@ -201,7 +201,7 @@ public static partial class Tensor
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static Tensor<TScalar> SubtractTo<TScalar>(in TensorSpan<TScalar> span1, in TensorSpan<TScalar> span2)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         BinaryOperation<TScalar> op = static (e1, e2) => e1 - e2;
         return Execute<TScalar>(span1, span2, op);
@@ -214,7 +214,7 @@ public static partial class Tensor
     /// <param name="tensor2">The second tensor.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static void Multiply<TScalar>(Tensor<TScalar> tensor1, Tensor<TScalar> tensor2)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         Multiply(tensor1.AsSpan(), tensor2.AsSpan());
     }
@@ -226,7 +226,7 @@ public static partial class Tensor
     /// <param name="span2">The second tensor span.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static void Multiply<TScalar>(in TensorSpan<TScalar> span1, in TensorSpan<TScalar> span2)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         BinaryOperation<TScalar> op = static (e1, e2) => e1 * e2;
         ExecuteIn<TScalar>(span1, span2, op);
@@ -240,7 +240,7 @@ public static partial class Tensor
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static Tensor<TScalar> MultiplyTo<TScalar>(Tensor<TScalar> tensor1, Tensor<TScalar> tensor2)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         return MultiplyTo(tensor1.AsSpan(), tensor2.AsSpan());
     }
@@ -253,7 +253,7 @@ public static partial class Tensor
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static Tensor<TScalar> MultiplyTo<TScalar>(in TensorSpan<TScalar> span1, in TensorSpan<TScalar> span2)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         BinaryOperation<TScalar> op = static (e1, e2) => e1 * e2;
         return Execute<TScalar>(span1, span2, op);
@@ -266,7 +266,7 @@ public static partial class Tensor
     /// <param name="tensor2">The tensor to divide.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static void Divide<TScalar>(Tensor<TScalar> tensor1, Tensor<TScalar> tensor2)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         Divide(tensor1.AsSpan(), tensor2.AsSpan());
     }
@@ -278,7 +278,7 @@ public static partial class Tensor
     /// <param name="span2">The tensor span to divide.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static void Divide<TScalar>(in TensorSpan<TScalar> span1, in TensorSpan<TScalar> span2)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         BinaryOperation<TScalar> op = static (e1, e2) => e1 / e2;
         ExecuteIn<TScalar>(span1, span2, op);
@@ -292,7 +292,7 @@ public static partial class Tensor
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static Tensor<TScalar> DivideTo<TScalar>(Tensor<TScalar> tensor1, Tensor<TScalar> tensor2)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         return DivideTo(tensor1.AsSpan(), tensor2.AsSpan());
     }
@@ -305,7 +305,7 @@ public static partial class Tensor
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static Tensor<TScalar> DivideTo<TScalar>(in TensorSpan<TScalar> span1, in TensorSpan<TScalar> span2)
-        where TScalar : struct, INumberBase<TScalar>
+        where TScalar : struct, INumber<TScalar>
     {
         BinaryOperation<TScalar> op = static (e1, e2) => e1 / e2;
         return Execute<TScalar>(span1, span2, op);

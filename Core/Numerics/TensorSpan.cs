@@ -8,7 +8,7 @@ namespace NeuralNetworks.Core.Numerics;
 /// </summary>
 /// <inheritdoc cref="ITensor{TScalar}" path="/typeparam"/>
 public readonly ref struct TensorSpan<TScalar> : ITensor<TScalar>
-    where TScalar : struct, INumberBase<TScalar>
+    where TScalar : struct, INumber<TScalar>
 {
     /// <summary>Gets the empty instance.</summary>
     public static TensorSpan<TScalar> Empty => default;

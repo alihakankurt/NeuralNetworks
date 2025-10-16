@@ -1,4 +1,5 @@
 using System.Buffers;
+using System.Runtime.CompilerServices;
 
 namespace NeuralNetworks.Core.Numerics;
 
@@ -61,6 +62,7 @@ public readonly partial struct TensorShape
     /// <param name="other">The other shape to broadcast.</param>
     /// <inheritdoc cref="TensorShape.TryBroadcast(in TensorShape, in TensorShape, out TensorShape)" path="/param[@name='result']"/>
     /// <inheritdoc cref="TensorShape.TryBroadcast(in TensorShape, in TensorShape, out TensorShape)" path="/returns"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly bool TryBroadcast(in TensorShape other, out TensorShape result)
     {
         return TensorShape.TryBroadcast(this, other, out result);
@@ -131,8 +133,8 @@ public readonly partial struct TensorShape
             int dimension1 = dimension - offset1;
             int dimension2 = dimension - offset2;
 
-            int length1 = (dimension1 >= 0) ? lengths1[dimension1] : 1;
-            int length2 = (dimension2 >= 0) ? lengths2[dimension2] : 1;
+            int length1 = (dimension1 < 0) ? 1 : lengths1[dimension1];
+            int length2 = (dimension2 < 0) ? 1 : lengths2[dimension2];
 
             int stride1 = (length1 == 1) ? 0 : strides1[dimension1];
             int stride2 = (length2 == 1) ? 0 : strides2[dimension2];
