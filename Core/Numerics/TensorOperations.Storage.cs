@@ -60,10 +60,37 @@ public static partial class Tensor
     /// <param name="destination">The destination tensor span.</param>
     /// <param name="source">The source tensor span.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static void Set<TScalar>(this in TensorSpan<TScalar> span1, in TensorSpan<TScalar> span2)
+    public static void Set<TScalar>(this in TensorSpan<TScalar> destination, in TensorSpan<TScalar> source)
         where TScalar : struct, INumber<TScalar>
     {
         BinaryOperation<TScalar> op = static (_, e2) => e2;
-        ExecuteIn<TScalar>(span1, span2, op);
+        ExecuteIn<TScalar>(destination, source, op);
+    }
+
+    /// <summary>
+    /// Randomizes the values of <paramref name="tensor"/>.
+    /// </summary>
+    /// <param name="tensor">The tensor to randomize.</param>
+    /// <param name="min">The minimum value.</param>
+    /// <param name="max">The maximum value.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static void Randomize<TScalar>(this Tensor<TScalar> tensor, TScalar min, TScalar max)
+        where TScalar : struct, INumber<TScalar>
+    {
+        Randomize(tensor.AsSpan(), min, max);
+    }
+
+    /// <summary>
+    /// Randomizes the values of <paramref name="tensor"/>.
+    /// </summary>
+    /// <param name="span">The tensor span to randomize.</param>
+    /// <param name="min">The minimum value.</param>
+    /// <param name="max">The maximum value.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static void Randomize<TScalar>(this in TensorSpan<TScalar> span, TScalar min, TScalar max)
+        where TScalar : struct, INumber<TScalar>
+    {
+        UnaryOperation<TScalar> op = (_) => TScalar.CreateTruncating(Random.Shared.NextDouble()) * (max - min) + min;
+        ExecuteIn<TScalar>(span, op);
     }
 }
