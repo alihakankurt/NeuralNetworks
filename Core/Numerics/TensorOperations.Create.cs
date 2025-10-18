@@ -76,8 +76,82 @@ public static partial class Tensor
     }
 
     /// <summary>
+    /// Creates a new 1-dimensional <see cref="Tensor{TScalar}"/> with the specified values.
+    /// </summary>
+    /// <param name="source">The span of values.</param>
+    /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Tensor<TScalar> CreateFrom<TScalar>(params ReadOnlySpan<TScalar> source)
+        where TScalar : struct, INumber<TScalar>
+    {
+        TScalar[] storage = [];
+        TensorShape shape = TensorShape.Empty;
+
+        if (source.Length > 0)
+        {
+            shape = TensorShape.Create([source.Length]);
+            storage = GC.AllocateUninitializedArray<TScalar>(shape.ElementCount);
+            source.CopyTo(storage.AsSpan());
+        }
+
+        return new Tensor<TScalar>(shape, storage);
+    }
+
+    /// <summary>
+    /// Creates a new 1-dimensional <see cref="Tensor{TScalar}"/> with the specified values.
+    /// </summary>
+    /// <param name="source">The list of values.</param>
+    /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Tensor<TScalar> CreateFrom<TScalar>(List<TScalar> source)
+        where TScalar : struct, INumber<TScalar>
+    {
+        return Tensor.CreateFrom<TScalar>(CollectionsMarshal.AsSpan(source));
+    }
+
+    /// <summary>
+    /// Creates a new 2-dimensional <see cref="Tensor{TScalar}"/> with the specified values.
+    /// </summary>
+    /// <param name="source">The span of value collections.</param>
+    /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Tensor<TScalar> CreateFrom<TScalar>(params ReadOnlySpan<TScalar[]> source)
+        where TScalar : struct, INumber<TScalar>
+    {
+        TScalar[] storage = [];
+        TensorShape shape = TensorShape.Empty;
+
+        if (source.Length > 0)
+        {
+            shape = TensorShape.Create([source.Length, source[0].Length]);
+            storage = GC.AllocateUninitializedArray<TScalar>(shape.ElementCount);
+
+            for (int y = 0; y < source.Length; ++y)
+            {
+                ArgumentOutOfRangeException.ThrowIfNotEqual(source[y].Length, source[0].Length);
+                source[y].CopyTo(storage.AsSpan(y * source[0].Length, source[0].Length));
+            }
+        }
+
+        return new Tensor<TScalar>(shape, storage);
+    }
+
+    /// <summary>
+    /// Creates a new 2-dimensional <see cref="Tensor{TScalar}"/> with the specified values.
+    /// </summary>
+    /// <param name="source">The list of value collections.</param>
+    /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Tensor<TScalar> CreateFrom<TScalar>(List<TScalar[]> source)
+        where TScalar : struct, INumber<TScalar>
+    {
+        return Tensor.CreateFrom<TScalar>(CollectionsMarshal.AsSpan(source));
+    }
+
+    /// <summary>
     /// Creates a clone of the tensor instance.
     /// </summary>
+    /// <param name="tensor">The tensor to clone.</param>
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/> as clone</returns>
     public static Tensor<TScalar> Clone<TScalar>(this Tensor<TScalar> tensor)
         where TScalar : struct, INumber<TScalar>
