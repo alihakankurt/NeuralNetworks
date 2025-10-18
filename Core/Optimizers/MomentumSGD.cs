@@ -17,11 +17,6 @@ public sealed class MomentumSGD<TScalar> : IOptimizer<TScalar>
         _momentum = momentum;
     }
 
-    public void Dispose()
-    {
-        _velocities.Clear();
-    }
-
     public void Optimize(Tensor<TScalar> parameters, in TensorSpan<TScalar> gradients)
     {
         TensorShape shape = parameters.Shape;
@@ -55,5 +50,10 @@ public sealed class MomentumSGD<TScalar> : IOptimizer<TScalar>
             v = _momentum * v - _learningRate * gradients[indices];
             parameters[indices] += v;
         }
+    }
+
+    public void Clean()
+    {
+        _velocities.Clear();
     }
 }

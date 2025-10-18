@@ -13,10 +13,6 @@ public sealed class SGD<TScalar> : IOptimizer<TScalar>
         _learningRate = learningRate;
     }
 
-    public void Dispose()
-    {
-    }
-
     public void Optimize(Tensor<TScalar> parameters, in TensorSpan<TScalar> gradients)
     {
         TensorShape shape = parameters.Shape;
@@ -40,5 +36,9 @@ public sealed class SGD<TScalar> : IOptimizer<TScalar>
         {
             parameters[indices] -= _learningRate * gradients[indices];
         }
+    }
+
+    public void Clean()
+    {
     }
 }
