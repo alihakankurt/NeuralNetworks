@@ -26,8 +26,8 @@ public static partial class Tensor
     public static void Fill<TScalar>(this in TensorSpan<TScalar> span, TScalar value)
         where TScalar : struct, INumber<TScalar>
     {
-        UnaryOperation<TScalar> op = (_) => value;
-        ExecuteIn<TScalar>(span, op);
+        ScalarOperation<TScalar> op = static (_, v) => v;
+        ExecuteIn<TScalar>(span, value, op);
     }
 
     /// <summary>

@@ -59,6 +59,103 @@ public static partial class Tensor
     }
 
     /// <summary>
+    /// Executes an scalar operation over the <see cref="tensor"/>.
+    /// </summary>
+    /// <param name="tensor">The tensor.</param>
+    /// <param name="value">The scalar value.</param>
+    /// <param name="operation">The scalar operation to execute.</param>
+    /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Tensor<TScalar> Execute<TScalar>(this Tensor<TScalar> tensor, TScalar value, ScalarOperation<TScalar> operation)
+        where TScalar : struct, INumber<TScalar>
+    {
+        return Tensor.Execute<TScalar>(tensor.AsSpan(), value, operation);
+    }
+
+    /// <summary>
+    /// Executes an scalar operation over the <see cref="span"/>.
+    /// </summary>
+    /// <param name="span">The tensor span.</param>
+    /// <param name="value">The scalar value.</param>
+    /// <param name="operation">The scalar operation to execute.</param>
+    /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
+    public static Tensor<TScalar> Execute<TScalar>(this in TensorSpan<TScalar> span, TScalar value, ScalarOperation<TScalar> operation)
+        where TScalar : struct, INumber<TScalar>
+    {
+        TensorShape shape = span.Shape;
+        var result = Tensor.Create<TScalar>(shape);
+
+        if (shape.Rank == 0)
+        {
+            TScalar element = span.ElementAt(0);
+            ref TScalar resultElement = ref result.ElementAt(0);
+
+            resultElement = operation(element, value);
+            return result;
+        }
+
+        Span<int> indices = stackalloc int[shape.Rank];
+        TensorShape.InitializeForwardIndexing(indices);
+
+        while (shape.MoveToNextIndex(indices))
+        {
+            int linearIndex = shape.ComputeLinearIndexUnchecked(indices);
+
+            TScalar element = span.ElementAt(linearIndex);
+            ref TScalar resultElement = ref result.ElementAt(linearIndex);
+
+            resultElement = operation(element, value);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Executes an scalar operation over the <see cref="tensor"/> in-place.
+    /// </summary>
+    /// <param name="tensor">The tensor.</param>
+    /// <param name="value">The scalar value.</param>
+    /// <param name="operation">The scalar operation to execute.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void ExecuteIn<TScalar>(this Tensor<TScalar> tensor, TScalar value, ScalarOperation<TScalar> operation)
+        where TScalar : struct, INumber<TScalar>
+    {
+        Tensor.ExecuteIn(tensor.AsSpan(), value, operation);
+    }
+
+    /// <summary>
+    /// Executes an scalar operation over the <see cref="span"/> in-place.
+    /// </summary>
+    /// <param name="span">The tensor span.</param>
+    /// <param name="value">The scalar value.</param>
+    /// <param name="operation">The scalar operation to execute.</param>
+    public static void ExecuteIn<TScalar>(this in TensorSpan<TScalar> span, TScalar value, ScalarOperation<TScalar> operation)
+        where TScalar : struct, INumber<TScalar>
+    {
+        TensorShape shape = span.Shape;
+
+        if (shape.Rank == 0)
+        {
+            ref TScalar resultElement = ref span.ElementAt(0);
+
+            resultElement = operation(resultElement, value);
+            return;
+        }
+
+        Span<int> indices = stackalloc int[shape.Rank];
+        TensorShape.InitializeForwardIndexing(indices);
+
+        while (shape.MoveToNextIndex(indices))
+        {
+            int linearIndex = shape.ComputeLinearIndexUnchecked(indices);
+
+            ref TScalar resultElement = ref span.ElementAt(linearIndex);
+
+            resultElement = operation(resultElement, value);
+        }
+    }
+
+    /// <summary>
     /// Executes an unary operation over the <see cref="tensor"/>.
     /// </summary>
     /// <param name="tensor">The tensor.</param>
@@ -272,6 +369,12 @@ public static partial class Tensor
     /// Represents an operation that outputs a single value by accumulating the elemenets.
     /// </summary>
     public delegate TScalar CumulativeOperation<TScalar>(TScalar accumulator, TScalar element)
+        where TScalar : struct, INumber<TScalar>;
+
+    /// <summary>
+    /// Represents an operation that executed for each element by a scalar value.
+    /// </summary>
+    public delegate TScalar ScalarOperation<TScalar>(TScalar element, TScalar value)
         where TScalar : struct, INumber<TScalar>;
 
     /// <summary>

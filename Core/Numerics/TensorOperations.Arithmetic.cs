@@ -6,10 +6,10 @@ namespace NeuralNetworks.Core.Numerics;
 public static partial class Tensor
 {
     /// <summary>
-    /// Calculates sum of the elements of <paramref name="tensor"/>.
+    /// Calculates the sum of the elements of the <paramref name="tensor"/>.
     /// </summary>
     /// <param name="tensor">The tensor.</param>
-    /// <returns>The sum of the elements.</returns>
+    /// <returns>A single <typeparamref name="TScalar"/> representing the sum.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static TScalar Sum<TScalar>(this Tensor<TScalar> tensor)
         where TScalar : struct, INumber<TScalar>
@@ -18,10 +18,10 @@ public static partial class Tensor
     }
 
     /// <summary>
-    /// Calculates sum of the elements of <paramref name="span"/>.
+    /// Calculates the sum of the elements of the <paramref name="span"/>.
     /// </summary>
     /// <param name="span">The tensor span.</param>
-    /// <returns>The sum of the elements.</returns>
+    /// <returns>A single <typeparamref name="TScalar"/> representing the sum.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static TScalar Sum<TScalar>(this in TensorSpan<TScalar> span)
         where TScalar : struct, INumber<TScalar>
@@ -31,10 +31,10 @@ public static partial class Tensor
     }
 
     /// <summary>
-    /// Calculates product of the elements of <paramref name="tensor"/>.
+    /// Calculates the product of the elements of the <paramref name="tensor"/>.
     /// </summary>
     /// <param name="tensor">The tensor.</param>
-    /// <returns>The product of the elements.</returns>
+    /// <returns>A single <typeparamref name="TScalar"/> representing the product.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static TScalar Product<TScalar>(this Tensor<TScalar> tensor)
         where TScalar : struct, INumber<TScalar>
@@ -43,10 +43,10 @@ public static partial class Tensor
     }
 
     /// <summary>
-    /// Calculates product of the elements of <paramref name="span"/>.
+    /// Calculates the product of the elements of the <paramref name="span"/>.
     /// </summary>
     /// <param name="span">The tensor span.</param>
-    /// <returns>The product of the elements.</returns>
+    /// <returns>A single <typeparamref name="TScalar"/> representing the product.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static TScalar Product<TScalar>(this in TensorSpan<TScalar> span)
         where TScalar : struct, INumber<TScalar>
@@ -56,7 +56,7 @@ public static partial class Tensor
     }
 
     /// <summary>
-    /// Negates the elements of <paramref name="tensor"/>.
+    /// Negates the elements of the <paramref name="tensor"/>.
     /// </summary>
     /// <param name="tensor">The tensor.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
@@ -67,7 +67,7 @@ public static partial class Tensor
     }
 
     /// <summary>
-    /// Negates the elements of <paramref name="span"/>.
+    /// Negates the elements of the <paramref name="span"/>.
     /// </summary>
     /// <param name="span">The tensor span.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
@@ -79,7 +79,7 @@ public static partial class Tensor
     }
 
     /// <summary>
-    /// Negates the elements of <paramref name="tensor"/> to a new tensor.
+    /// Negates the elements of the <paramref name="tensor"/> into a new tensor.
     /// </summary>
     /// <param name="tensor">The tensor.</param>
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
@@ -91,7 +91,7 @@ public static partial class Tensor
     }
 
     /// <summary>
-    /// Negates the elements of <paramref name="span"/> to a new tensor.
+    /// Negates the elements of the <paramref name="span"/> into a new tensor.
     /// </summary>
     /// <param name="span">The tensor span.</param>
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
@@ -104,9 +104,9 @@ public static partial class Tensor
     }
 
     /// <summary>
-    /// Adds the elements of <paramref name="right"/> to <paramref name="left"/>.
+    /// Adds the elements of the <paramref name="right"/> to the <paramref name="left"/>.
     /// </summary>
-    /// <param name="left">The tensor.</param>
+    /// <param name="left">The tensor to be added.</param>
     /// <param name="right">The tensor to add.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static void Add<TScalar>(this Tensor<TScalar> left, Tensor<TScalar> right)
@@ -116,23 +116,48 @@ public static partial class Tensor
     }
 
     /// <summary>
-    /// Adds the elements of <paramref name="right"/> to <paramref name="left"/>.
+    /// Adds the elements of the <paramref name="right"/> to the <paramref name="left"/>.
     /// </summary>
-    /// <param name="left">The tensor span.</param>
+    /// <param name="left">The tensor span to be added.</param>
     /// <param name="right">The tensor span to add.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static void Add<TScalar>(this in TensorSpan<TScalar> left, in TensorSpan<TScalar> right)
         where TScalar : struct, INumber<TScalar>
     {
-        BinaryOperation<TScalar> op = static (e1, e2) => e1 + e2;
+        BinaryOperation<TScalar> op = static (l, r) => l + r;
         ExecuteIn<TScalar>(left, right, op);
     }
 
     /// <summary>
-    /// Adds the elements of <paramref name="left"/> and <paramref name="right"/> to a new tensor.
+    /// Adds the <paramref name="value"/> to the elements of the <paramref name="tensor"/>.
     /// </summary>
-    /// <param name="left">The first tensor.</param>
-    /// <param name="right">The second tensor.</param>
+    /// <param name="tensor">The tensor to be added.</param>
+    /// <param name="value">The value to add.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static void Add<TScalar>(this Tensor<TScalar> tensor, TScalar value)
+        where TScalar : struct, INumber<TScalar>
+    {
+        Add(tensor.AsSpan(), value);
+    }
+
+    /// <summary>
+    /// Adds the <paramref name="value"/> to the elements of the <paramref name="span"/>.
+    /// </summary>
+    /// <param name="span">The tensor span to be added.</param>
+    /// <param name="value">The value to add.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static void Add<TScalar>(this in TensorSpan<TScalar> span, TScalar value)
+        where TScalar : struct, INumber<TScalar>
+    {
+        ScalarOperation<TScalar> op = static (e, v) => e + v;
+        ExecuteIn<TScalar>(span, value, op);
+    }
+
+    /// <summary>
+    /// Adds the elements of the <paramref name="left"/> and the <paramref name="right"/> into a new tensor.
+    /// </summary>
+    /// <param name="left">The first tensor to add.</param>
+    /// <param name="right">The second tensor to add.</param>
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static Tensor<TScalar> AddTo<TScalar>(Tensor<TScalar> left, Tensor<TScalar> right)
@@ -142,224 +167,460 @@ public static partial class Tensor
     }
 
     /// <summary>
-    /// Adds the elements of <paramref name="left"/> and <paramref name="right"/> to a new tensor.
+    /// Adds the elements of the <paramref name="left"/> and the <paramref name="right"/> into a new tensor.
     /// </summary>
-    /// <param name="left">The first tensor span.</param>
-    /// <param name="right">The second tensor span.</param>
+    /// <param name="left">The first tensor span to add.</param>
+    /// <param name="right">The second tensor span to add.</param>
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static Tensor<TScalar> AddTo<TScalar>(in TensorSpan<TScalar> left, in TensorSpan<TScalar> right)
         where TScalar : struct, INumber<TScalar>
     {
-        BinaryOperation<TScalar> op = static (e1, e2) => e1 + e2;
+        BinaryOperation<TScalar> op = static (l, r) => l + r;
         return Execute<TScalar>(left, right, op);
     }
 
     /// <summary>
-    /// Subtracts the elements of <paramref name="tensor2"/> from the elements of <paramref name="tensor1"/>.
+    /// Adds the <paramref name="value"/> to the elements of the <paramref name="tensor"/> into a new tensor.
     /// </summary>
-    /// <param name="tensor1">The tensor to be subtracted.</param>
-    /// <param name="tensor2">The tensor to subtract.</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static void Subtract<TScalar>(Tensor<TScalar> tensor1, Tensor<TScalar> tensor2)
-        where TScalar : struct, INumber<TScalar>
-    {
-        Subtract(tensor1.AsSpan(), tensor2.AsSpan());
-    }
-
-    /// <summary>
-    /// Subtracts the elements of <paramref name="span2"/> from the elements of <paramref name="span1"/>.
-    /// </summary>
-    /// <param name="span1">The tensor span to be subtracted.</param>
-    /// <param name="span2">The tensor span to subtract.</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static void Subtract<TScalar>(in TensorSpan<TScalar> span1, in TensorSpan<TScalar> span2)
-        where TScalar : struct, INumber<TScalar>
-    {
-        BinaryOperation<TScalar> op = static (e1, e2) => e1 - e2;
-        ExecuteIn<TScalar>(span1, span2, op);
-    }
-
-    /// <summary>
-    /// Subtracts the elements of <paramref name="tensor2"/> from the elements of <paramref name="tensor1"/> to a new tensor.
-    /// </summary>
-    /// <param name="tensor1">The tensor to be subtracted.</param>
-    /// <param name="tensor2">The tensor to subtract.</param>
+    /// <param name="tensor">The tensor to add.</param>
+    /// <param name="value">The value to add.</param>
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static Tensor<TScalar> SubtractTo<TScalar>(Tensor<TScalar> tensor1, Tensor<TScalar> tensor2)
+    public static Tensor<TScalar> AddTo<TScalar>(Tensor<TScalar> tensor, TScalar value)
         where TScalar : struct, INumber<TScalar>
     {
-        return SubtractTo(tensor1.AsSpan(), tensor2.AsSpan());
+        return AddTo(tensor.AsSpan(), value);
     }
 
     /// <summary>
-    /// Subtracts the elements of <paramref name="span2"/> from the elements of <paramref name="span1"/> to a new tensor.
+    /// Adds the <paramref name="value"/> to the elements of the <paramref name="span"/> into a new tensor.
     /// </summary>
-    /// <param name="span1">The tensor span to be subtracted.</param>
-    /// <param name="span2">The tensor span to subtract.</param>
+    /// <param name="span">The tensor span to add.</param>
+    /// <param name="value">The value to add.</param>
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static Tensor<TScalar> SubtractTo<TScalar>(in TensorSpan<TScalar> span1, in TensorSpan<TScalar> span2)
+    public static Tensor<TScalar> AddTo<TScalar>(in TensorSpan<TScalar> span, TScalar value)
         where TScalar : struct, INumber<TScalar>
     {
-        BinaryOperation<TScalar> op = static (e1, e2) => e1 - e2;
-        return Execute<TScalar>(span1, span2, op);
+        ScalarOperation<TScalar> op = static (e, v) => e + v;
+        return Execute<TScalar>(span, value, op);
     }
 
     /// <summary>
-    /// Multiplies the elements of <paramref name="tensor1"/> and <paramref name="tensor2"/>.
+    /// Subtracts the elements of the <paramref name="right"/> from the <paramref name="left"/>.
     /// </summary>
-    /// <param name="tensor1">The first tensor.</param>
-    /// <param name="tensor2">The second tensor.</param>
+    /// <param name="left">The tensor to be subtracted.</param>
+    /// <param name="right">The tensor to subtract.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static void Multiply<TScalar>(Tensor<TScalar> tensor1, Tensor<TScalar> tensor2)
+    public static void Subtract<TScalar>(Tensor<TScalar> left, Tensor<TScalar> right)
         where TScalar : struct, INumber<TScalar>
     {
-        Multiply(tensor1.AsSpan(), tensor2.AsSpan());
+        Subtract(left.AsSpan(), right.AsSpan());
     }
 
     /// <summary>
-    /// Multiplies the elements of <paramref name="span1"/> and <paramref name="span2"/>.
+    /// Subtracts the elements of the <paramref name="right"/> from the <paramref name="left"/>.
     /// </summary>
-    /// <param name="span1">The first tensor span.</param>
-    /// <param name="span2">The second tensor span.</param>
+    /// <param name="left">The tensor span to be subtracted.</param>
+    /// <param name="right">The tensor span to subtract.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static void Multiply<TScalar>(in TensorSpan<TScalar> span1, in TensorSpan<TScalar> span2)
+    public static void Subtract<TScalar>(in TensorSpan<TScalar> left, in TensorSpan<TScalar> right)
         where TScalar : struct, INumber<TScalar>
     {
-        BinaryOperation<TScalar> op = static (e1, e2) => e1 * e2;
-        ExecuteIn<TScalar>(span1, span2, op);
+        BinaryOperation<TScalar> op = static (l, r) => l - r;
+        ExecuteIn<TScalar>(left, right, op);
     }
 
     /// <summary>
-    /// Multiplies the elements of <paramref name="tensor1"/> and <paramref name="tensor2"/> to a new tensor.
+    /// Subtracts the <paramref name="value"/> from the elements of the <paramref name="tensor"/>.
     /// </summary>
-    /// <param name="tensor1">The first tensor.</param>
-    /// <param name="tensor2">The second tensor.</param>
+    /// <param name="tensor">The tensor to be subtracted.</param>
+    /// <param name="value">The value to subtract.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static void Subtract<TScalar>(Tensor<TScalar> tensor, TScalar value)
+        where TScalar : struct, INumber<TScalar>
+    {
+        Subtract(tensor.AsSpan(), value);
+    }
+
+    /// <summary>
+    /// Subtracts the <paramref name="value"/> from the elements of the <paramref name="span"/>.
+    /// </summary>
+    /// <param name="span">The tensor span to be subtracted.</param>
+    /// <param name="value">The value to subtract.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static void Subtract<TScalar>(in TensorSpan<TScalar> span, TScalar value)
+        where TScalar : struct, INumber<TScalar>
+    {
+        ScalarOperation<TScalar> op = static (e, v) => e - v;
+        ExecuteIn<TScalar>(span, value, op);
+    }
+
+    /// <summary>
+    /// Subtracts the elements of the <paramref name="right"/> from the <paramref name="left"/> into a new tensor.
+    /// </summary>
+    /// <param name="left">The tensor to be subtracted.</param>
+    /// <param name="right">The tensor to subtract.</param>
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static Tensor<TScalar> MultiplyTo<TScalar>(Tensor<TScalar> tensor1, Tensor<TScalar> tensor2)
+    public static Tensor<TScalar> SubtractTo<TScalar>(Tensor<TScalar> left, Tensor<TScalar> right)
         where TScalar : struct, INumber<TScalar>
     {
-        return MultiplyTo(tensor1.AsSpan(), tensor2.AsSpan());
+        return SubtractTo(left.AsSpan(), right.AsSpan());
     }
 
     /// <summary>
-    /// Multiplies the elements of <paramref name="span1"/> and <paramref name="span2"/> to a new tensor.
+    /// Subtracts the elements of the <paramref name="right"/> from the <paramref name="left"/> into a new tensor.
     /// </summary>
-    /// <param name="span1">The first tensor span.</param>
-    /// <param name="span2">The second tensor span.</param>
+    /// <param name="left">The tensor span to be subtracted.</param>
+    /// <param name="right">The tensor span to subtract.</param>
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static Tensor<TScalar> MultiplyTo<TScalar>(in TensorSpan<TScalar> span1, in TensorSpan<TScalar> span2)
+    public static Tensor<TScalar> SubtractTo<TScalar>(in TensorSpan<TScalar> left, in TensorSpan<TScalar> right)
         where TScalar : struct, INumber<TScalar>
     {
-        BinaryOperation<TScalar> op = static (e1, e2) => e1 * e2;
-        return Execute<TScalar>(span1, span2, op);
+        BinaryOperation<TScalar> op = static (l, r) => l - r;
+        return Execute<TScalar>(left, right, op);
     }
 
     /// <summary>
-    /// Divides the values of <paramref name="tensor1"/> by the values of <paramref name="tensor2"/>.
+    /// Subtracts the <paramref name="value"/> from the elements of the <paramref name="tensor"/> into a new tensor.
     /// </summary>
-    /// <param name="tensor1">The tensor to be divided.</param>
-    /// <param name="tensor2">The tensor to divide.</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static void Divide<TScalar>(Tensor<TScalar> tensor1, Tensor<TScalar> tensor2)
-        where TScalar : struct, INumber<TScalar>
-    {
-        Divide(tensor1.AsSpan(), tensor2.AsSpan());
-    }
-
-    /// <summary>
-    /// Divides the values of <paramref name="span1"/> by the values of <paramref name="span2"/>.
-    /// </summary>
-    /// <param name="span1">The tensor span to be divided.</param>
-    /// <param name="span2">The tensor span to divide.</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static void Divide<TScalar>(in TensorSpan<TScalar> span1, in TensorSpan<TScalar> span2)
-        where TScalar : struct, INumber<TScalar>
-    {
-        BinaryOperation<TScalar> op = static (e1, e2) => e1 / e2;
-        ExecuteIn<TScalar>(span1, span2, op);
-    }
-
-    /// <summary>
-    /// Divides the values of <paramref name="tensor1"/> by the values of <paramref name="tensor2"/> to a new tensor.
-    /// </summary>
-    /// <param name="tensor1">The tensor to be divided.</param>
-    /// <param name="tensor2">The tensor to divide.</param>
+    /// <param name="tensor">The tensor to be subtracted.</param>
+    /// <param name="value">The value to subtract.</param>
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static Tensor<TScalar> DivideTo<TScalar>(Tensor<TScalar> tensor1, Tensor<TScalar> tensor2)
+    public static Tensor<TScalar> SubtractTo<TScalar>(Tensor<TScalar> tensor, TScalar value)
         where TScalar : struct, INumber<TScalar>
     {
-        return DivideTo(tensor1.AsSpan(), tensor2.AsSpan());
+        return SubtractTo(tensor.AsSpan(), value);
     }
 
     /// <summary>
-    /// Divides the values of <paramref name="span1"/> by the values of <paramref name="span2"/> to a new tensor.
+    /// Subtracts the <paramref name="value"/> from the elements of the <paramref name="span"/> into a new tensor.
     /// </summary>
-    /// <param name="span1">The tensor span to be divided.</param>
-    /// <param name="span2">The tensor span to divide.</param>
+    /// <param name="span">The tensor span to be subtracted.</param>
+    /// <param name="value">The value to subtract.</param>
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static Tensor<TScalar> DivideTo<TScalar>(in TensorSpan<TScalar> span1, in TensorSpan<TScalar> span2)
+    public static Tensor<TScalar> SubtractTo<TScalar>(in TensorSpan<TScalar> span, TScalar value)
         where TScalar : struct, INumber<TScalar>
     {
-        BinaryOperation<TScalar> op = static (e1, e2) => e1 / e2;
-        return Execute<TScalar>(span1, span2, op);
+        ScalarOperation<TScalar> op = static (e, v) => e - v;
+        return Execute<TScalar>(span, value, op);
     }
 
     /// <summary>
-    /// Divides the values of <paramref name="tensor1"/> by the values of <paramref name="tensor2"/> and computes the remainders.
+    /// Multiplies the elements of the <paramref name="left"/> by the <paramref name="right"/>.
     /// </summary>
-    /// <param name="tensor1">The tensor to be divided.</param>
-    /// <param name="tensor2">The tensor to divide.</param>
+    /// <param name="left">The tensor to be multiplied.</param>
+    /// <param name="right">The tensor to multiply.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static void Modulo<TScalar>(Tensor<TScalar> tensor1, Tensor<TScalar> tensor2)
+    public static void Multiply<TScalar>(Tensor<TScalar> left, Tensor<TScalar> right)
         where TScalar : struct, INumber<TScalar>
     {
-        Modulo(tensor1.AsSpan(), tensor2.AsSpan());
+        Multiply(left.AsSpan(), right.AsSpan());
     }
 
     /// <summary>
-    /// Divides the values of <paramref name="span1"/> by the values of <paramref name="span2"/> and computes the remainders.
+    /// Multiplies the elements of the <paramref name="left"/> by the <paramref name="right"/>.
     /// </summary>
-    /// <param name="span1">The tensor span to be divided.</param>
-    /// <param name="span2">The tensor span to divide.</param>
+    /// <param name="left">The tensor span to be multiplied.</param>
+    /// <param name="right">The tensor span to multiply.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static void Modulo<TScalar>(in TensorSpan<TScalar> span1, in TensorSpan<TScalar> span2)
+    public static void Multiply<TScalar>(in TensorSpan<TScalar> left, in TensorSpan<TScalar> right)
         where TScalar : struct, INumber<TScalar>
     {
-        BinaryOperation<TScalar> op = static (e1, e2) => e1 % e2;
-        ExecuteIn<TScalar>(span1, span2, op);
+        BinaryOperation<TScalar> op = static (l, r) => l * r;
+        ExecuteIn<TScalar>(left, right, op);
     }
 
     /// <summary>
-    /// Divides the values of <paramref name="tensor1"/> by the values of <paramref name="tensor2"/> and computes the remainders to a new tensor.
+    /// Multiplies the elements of the <paramref name="tensor"/> by the <paramref name="value"/>.
     /// </summary>
-    /// <param name="tensor1">The tensor to be divided.</param>
-    /// <param name="tensor2">The tensor to divide.</param>
+    /// <param name="tensor">The tensor to be multiplied.</param>
+    /// <param name="value">The value to multiply.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static void Multiply<TScalar>(Tensor<TScalar> tensor, TScalar value)
+        where TScalar : struct, INumber<TScalar>
+    {
+        Multiply(tensor.AsSpan(), value);
+    }
+
+    /// <summary>
+    /// Multiplies the elements of the <paramref name="span"/> by the <paramref name="value"/>.
+    /// </summary>
+    /// <param name="span">The tensor span to be multiplied.</param>
+    /// <param name="value">The value to multiply.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static void Multiply<TScalar>(in TensorSpan<TScalar> span, TScalar value)
+        where TScalar : struct, INumber<TScalar>
+    {
+        ScalarOperation<TScalar> op = static (e, v) => e * v;
+        ExecuteIn<TScalar>(span, value, op);
+    }
+
+    /// <summary>
+    /// Multiplies the elements of the <paramref name="left"/> and the <paramref name="right"/> into a new tensor.
+    /// </summary>
+    /// <param name="left">The first tensor to multiply.</param>
+    /// <param name="right">The second tensor to multiply.</param>
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static Tensor<TScalar> ModuloTo<TScalar>(Tensor<TScalar> tensor1, Tensor<TScalar> tensor2)
+    public static Tensor<TScalar> MultiplyTo<TScalar>(Tensor<TScalar> left, Tensor<TScalar> right)
         where TScalar : struct, INumber<TScalar>
     {
-        return ModuloTo(tensor1.AsSpan(), tensor2.AsSpan());
+        return MultiplyTo(left.AsSpan(), right.AsSpan());
     }
 
     /// <summary>
-    /// Divides the values of <paramref name="span1"/> by the values of <paramref name="span2"/> and computes the remainders to a new tensor.
+    /// Multiplies the elements of the <paramref name="left"/> and the <paramref name="right"/> into a new tensor.
     /// </summary>
-    /// <param name="span1">The tensor span to be divided.</param>
-    /// <param name="span2">The tensor span to divide.</param>
+    /// <param name="left">The first tensor span to multiply.</param>
+    /// <param name="right">The second tensor span to multiply.</param>
     /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static Tensor<TScalar> ModuloTo<TScalar>(in TensorSpan<TScalar> span1, in TensorSpan<TScalar> span2)
+    public static Tensor<TScalar> MultiplyTo<TScalar>(in TensorSpan<TScalar> left, in TensorSpan<TScalar> right)
         where TScalar : struct, INumber<TScalar>
     {
-        BinaryOperation<TScalar> op = static (e1, e2) => e1 % e2;
-        return Execute<TScalar>(span1, span2, op);
+        BinaryOperation<TScalar> op = static (l, r) => l * r;
+        return Execute<TScalar>(left, right, op);
+    }
+
+    /// <summary>
+    /// Multiplies the elements of the <paramref name="tensor"/> by the <paramref name="value"/> into a new tensor.
+    /// </summary>
+    /// <param name="tensor">The tensor to multiply.</param>
+    /// <param name="value">The value to multiply.</param>
+    /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static Tensor<TScalar> MultiplyTo<TScalar>(Tensor<TScalar> tensor, TScalar value)
+        where TScalar : struct, INumber<TScalar>
+    {
+        return MultiplyTo(tensor.AsSpan(), value);
+    }
+
+    /// <summary>
+    /// Multiplies the elements of the <paramref name="span"/> by the <paramref name="value"/> into a new tensor.
+    /// </summary>
+    /// <param name="span">The tensor span to multiply.</param>
+    /// <param name="value">The value to multiply.</param>
+    /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static Tensor<TScalar> MultiplyTo<TScalar>(in TensorSpan<TScalar> span, TScalar value)
+        where TScalar : struct, INumber<TScalar>
+    {
+        ScalarOperation<TScalar> op = static (e, v) => e * v;
+        return Execute<TScalar>(span, value, op);
+    }
+
+    /// <summary>
+    /// Divides the elements of the <paramref name="left"/> by the <paramref name="right"/>.
+    /// </summary>
+    /// <param name="left">The tensor to be divided.</param>
+    /// <param name="right">The tensor to divide.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static void Divide<TScalar>(Tensor<TScalar> left, Tensor<TScalar> right)
+        where TScalar : struct, INumber<TScalar>
+    {
+        Divide(left.AsSpan(), right.AsSpan());
+    }
+
+    /// <summary>
+    /// Divides the elements of the <paramref name="left"/> by the <paramref name="right"/>.
+    /// </summary>
+    /// <param name="left">The tensor span to be divided.</param>
+    /// <param name="right">The tensor span to divide.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static void Divide<TScalar>(in TensorSpan<TScalar> left, in TensorSpan<TScalar> right)
+        where TScalar : struct, INumber<TScalar>
+    {
+        BinaryOperation<TScalar> op = static (l, r) => l / r;
+        ExecuteIn<TScalar>(left, right, op);
+    }
+
+    /// <summary>
+    /// Divides the elements of the <paramref name="tensor"/> by the <paramref name="value"/>.
+    /// </summary>
+    /// <param name="tensor">The tensor to be divided.</param>
+    /// <param name="value">The value to divide.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static void Divide<TScalar>(Tensor<TScalar> tensor, TScalar value)
+        where TScalar : struct, INumber<TScalar>
+    {
+        Divide(tensor.AsSpan(), value);
+    }
+
+    /// <summary>
+    /// Divides the elements of the <paramref name="span"/> by the <paramref name="value"/>.
+    /// </summary>
+    /// <param name="span">The tensor span to be divided.</param>
+    /// <param name="value">The value to divide.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static void Divide<TScalar>(in TensorSpan<TScalar> span, TScalar value)
+        where TScalar : struct, INumber<TScalar>
+    {
+        ScalarOperation<TScalar> op = static (e, v) => e / v;
+        ExecuteIn<TScalar>(span, value, op);
+    }
+
+    /// <summary>
+    /// Divides the elements of the <paramref name="left"/> by the <paramref name="right"/> into a new tensor.
+    /// </summary>
+    /// <param name="left">The tensor to be divided.</param>
+    /// <param name="right">The tensor to divide.</param>
+    /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static Tensor<TScalar> DivideTo<TScalar>(Tensor<TScalar> left, Tensor<TScalar> right)
+        where TScalar : struct, INumber<TScalar>
+    {
+        return DivideTo(left.AsSpan(), right.AsSpan());
+    }
+
+
+    /// <summary>
+    /// Divides the elements of the <paramref name="left"/> by the <paramref name="right"/> into a new tensor.
+    /// </summary>
+    /// <param name="left">The tensor span to be divided.</param>
+    /// <param name="right">The tensor span to divide.</param>
+    /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static Tensor<TScalar> DivideTo<TScalar>(in TensorSpan<TScalar> left, in TensorSpan<TScalar> right)
+        where TScalar : struct, INumber<TScalar>
+    {
+        BinaryOperation<TScalar> op = static (l, r) => l / r;
+        return Execute<TScalar>(left, right, op);
+    }
+
+    /// <summary>
+    /// Divides the elements of the <paramref name="tensor"/> by the <paramref name="value"/> into a new tensor.
+    /// </summary>
+    /// <param name="tensor">The tensor to be divided.</param>
+    /// <param name="value">The value to divide.</param>
+    /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static Tensor<TScalar> DivideTo<TScalar>(Tensor<TScalar> tensor, TScalar value)
+        where TScalar : struct, INumber<TScalar>
+    {
+        return DivideTo(tensor.AsSpan(), value);
+    }
+
+    /// <summary>
+    /// Divides the elements of the <paramref name="span"/> by the <paramref name="value"/> into a new tensor.
+    /// </summary>
+    /// <param name="span">The tensor span to be divided.</param>
+    /// <param name="value">The value to divide.</param>
+    /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static Tensor<TScalar> DivideTo<TScalar>(in TensorSpan<TScalar> span, TScalar value)
+        where TScalar : struct, INumber<TScalar>
+    {
+        ScalarOperation<TScalar> op = static (e, v) => e / v;
+        return Execute<TScalar>(span, value, op);
+    }
+
+    /// <summary>
+    /// Takes the modulo of the elements of the <paramref name="left"/> by the <paramref name="right"/>.
+    /// </summary>
+    /// <param name="left">The tensor to be divided.</param>
+    /// <param name="right">The tensor to divide.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static void Modulo<TScalar>(Tensor<TScalar> left, Tensor<TScalar> right)
+        where TScalar : struct, INumber<TScalar>
+    {
+        Modulo(left.AsSpan(), right.AsSpan());
+    }
+
+    /// <summary>
+    /// Takes the modulo of the elements of the <paramref name="left"/> by the <paramref name="right"/>.
+    /// </summary>
+    /// <param name="left">The tensor span to be divided.</param>
+    /// <param name="right">The tensor span to divide.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static void Modulo<TScalar>(in TensorSpan<TScalar> left, in TensorSpan<TScalar> right)
+        where TScalar : struct, INumber<TScalar>
+    {
+        BinaryOperation<TScalar> op = static (l, r) => l % r;
+        ExecuteIn<TScalar>(left, right, op);
+    }
+
+    /// <summary>
+    /// Takes the modulo of the elements of the <paramref name="tensor"/> by the <paramref name="value"/>.
+    /// </summary>
+    /// <param name="tensor">The tensor to be divided.</param>
+    /// <param name="value">The value to divide.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static void Modulo<TScalar>(Tensor<TScalar> tensor, TScalar value)
+        where TScalar : struct, INumber<TScalar>
+    {
+        Modulo(tensor.AsSpan(), value);
+    }
+
+    /// <summary>
+    /// Takes the modulo of the elements of the <paramref name="span"/> by the <paramref name="value"/>.
+    /// </summary>
+    /// <param name="span">The tensor span to be divided.</param>
+    /// <param name="value">The value to divide.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static void Modulo<TScalar>(in TensorSpan<TScalar> span, TScalar value)
+        where TScalar : struct, INumber<TScalar>
+    {
+        ScalarOperation<TScalar> op = static (e, v) => e % v;
+        ExecuteIn<TScalar>(span, value, op);
+    }
+
+    /// <summary>
+    /// Takes the modulo of the elements of the <paramref name="left"/> by the <paramref name="right"/> into a new tensor.
+    /// </summary>
+    /// <param name="left">The tensor to be divided.</param>
+    /// <param name="right">The tensor to divide.</param>
+    /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static Tensor<TScalar> ModuloTo<TScalar>(Tensor<TScalar> left, Tensor<TScalar> right)
+        where TScalar : struct, INumber<TScalar>
+    {
+        return ModuloTo(left.AsSpan(), right.AsSpan());
+    }
+
+    /// <summary>
+    /// Takes the modulo of the elements of the <paramref name="left"/> by the <paramref name="right"/> into a new tensor.
+    /// </summary>
+    /// <param name="left">The tensor span to be divided.</param>
+    /// <param name="right">The tensor span to divide.</param>
+    /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static Tensor<TScalar> ModuloTo<TScalar>(in TensorSpan<TScalar> left, in TensorSpan<TScalar> right)
+        where TScalar : struct, INumber<TScalar>
+    {
+        BinaryOperation<TScalar> op = static (l, r) => l % r;
+        return Execute<TScalar>(left, right, op);
+    }
+
+    /// <summary>
+    /// Takes the modulo of the elements of the <paramref name="tensor"/> by the <paramref name="value"/> into a new tensor.
+    /// </summary>
+    /// <param name="tensor">The tensor to be divided.</param>
+    /// <param name="value">The value to divide.</param>
+    /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static Tensor<TScalar> ModuloTo<TScalar>(Tensor<TScalar> tensor, TScalar value)
+        where TScalar : struct, INumber<TScalar>
+    {
+        return ModuloTo(tensor.AsSpan(), value);
+    }
+
+    /// <summary>
+    /// Takes the modulo of the elements of the <paramref name="span"/> by the <paramref name="value"/>.
+    /// </summary>
+    /// <param name="span">The tensor span to be divided.</param>
+    /// <param name="value">The value to divide.</param>
+    /// <returns>A new instance of <see cref="Tensor{TScalar}"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static Tensor<TScalar> ModuloTo<TScalar>(in TensorSpan<TScalar> span, TScalar value)
+        where TScalar : struct, INumber<TScalar>
+    {
+        ScalarOperation<TScalar> op = static (e, v) => e % v;
+        return Execute<TScalar>(span, value, op);
     }
 }
