@@ -15,11 +15,9 @@ public sealed class SGD<TScalar> : IOptimizer<TScalar>
 
     public void Optimize(Tensor<TScalar> parameters, in TensorSpan<TScalar> gradients)
     {
+        Guard.ShapesAreEqual(parameters.Shape, gradients.Shape);
+
         TensorShape shape = parameters.Shape;
-        if (shape != gradients.Shape)
-        {
-            throw new IncompatibleShapeException(nameof(parameters), nameof(gradients));
-        }
 
         if (shape.Rank == 0)
         {

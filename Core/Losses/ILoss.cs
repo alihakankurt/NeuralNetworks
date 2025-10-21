@@ -7,5 +7,8 @@ public interface ILoss<TScalar>
     where TScalar : struct, INumber<TScalar>
 {
     static abstract TScalar Calculate(in TensorSpan<TScalar> outputs, in TensorSpan<TScalar> expectedOutputs);
-    static abstract void Gradient(in TensorSpan<TScalar> outputs, in TensorSpan<TScalar> expectedOutputs, in TensorSpan<TScalar> gradients);
+
+    static abstract Tensor<TScalar> Derivate(in TensorSpan<TScalar> outputs, in TensorSpan<TScalar> expectedOutputs);
+
+    static abstract void Derivate(in TensorSpan<TScalar> outputs, in TensorSpan<TScalar> expectedOutputs, in TensorSpan<TScalar> gradients);
 }

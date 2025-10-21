@@ -3,8 +3,8 @@ using NeuralNetworks.Core.Numerics;
 
 namespace NeuralNetworks.Core.Losses;
 
-public readonly struct MeanSquaredLoss<TScalar> : ILoss<TScalar>
-    where TScalar : struct, INumber<TScalar>
+public readonly struct CrossEntropyLoss<TScalar> : ILoss<TScalar>
+    where TScalar : struct, IFloatingPointIeee754<TScalar>
 {
     public static TScalar Calculate(in TensorSpan<TScalar> outputs, in TensorSpan<TScalar> expectedOutputs)
     {
@@ -13,25 +13,35 @@ public readonly struct MeanSquaredLoss<TScalar> : ILoss<TScalar>
         TensorShape shape = outputs.Shape;
         if (shape.Rank == 0)
         {
-            TScalar loss = outputs[0] - expectedOutputs[0];
-            return loss * loss;
+            TScalar output = outputs[0];
+            TScalar expected = expectedOutputs[0];
+
+            output = TScalar.Clamp(output, TScalar.Epsilon, TScalar.One - TScalar.Epsilon);
+            TScalar outputComplement = TScalar.One - output;
+            TScalar expectedComplement = TScalar.One - expected;
+
+            TScalar loss = expected * TScalar.Log(output) - expectedComplement * TScalar.Log(outputComplement);
+            return -loss;
         }
 
         ReadOnlySpan<int> lengths = shape.Lengths;
-
-        TScalar squaredLossSum = TScalar.Zero;
+        TScalar lossSum = TScalar.Zero;
 
         Span<int> indices = stackalloc int[shape.Rank];
         TensorShape.InitializeForwardIndexing(indices);
 
         while (TensorShape.MoveToNextIndex(lengths, indices))
         {
-            TScalar loss = outputs[indices] - expectedOutputs[indices];
-            squaredLossSum += loss * loss;
+            TScalar output = outputs[indices];
+            TScalar expected = expectedOutputs[indices];
+
+            output = TScalar.Max(output, TScalar.Epsilon);
+
+            lossSum += expected * TScalar.Log(output);
         }
 
-        TScalar averageLoss = squaredLossSum / TScalar.CreateTruncating(shape.ElementCount);
-        return averageLoss;
+        TScalar averageLoss = lossSum / TScalar.CreateTruncating(shape.ElementCount);
+        return -averageLoss;
     }
 
     public static Tensor<TScalar> Derivate(in TensorSpan<TScalar> outputs, in TensorSpan<TScalar> expectedOutputs)
@@ -47,10 +57,12 @@ public readonly struct MeanSquaredLoss<TScalar> : ILoss<TScalar>
 
         TensorShape shape = outputs.Shape;
 
-        TScalar two = TScalar.CreateTruncating(2);
         if (shape.Rank == 0)
         {
-            gradients[0] += two * (outputs[0] - expectedOutputs[0]);
+            TScalar output = outputs[0];
+            TScalar expected = expectedOutputs[0];
+
+            gradients[0] += output - expected;
             return;
         }
 
@@ -64,10 +76,10 @@ public readonly struct MeanSquaredLoss<TScalar> : ILoss<TScalar>
 
         while (TensorShape.MoveToNextIndex(lengths, indices))
         {
-            TScalar outputValue = outputs[indices];
-            TScalar expectedValue = expectedOutputs[indices];
+            TScalar output = outputs[indices];
+            TScalar expected = expectedOutputs[indices];
 
-            gradients[indices] += two * (outputValue - expectedValue) * elementFactor;
+            gradients[indices] += (output - expected) * elementFactor;
         }
     }
 }

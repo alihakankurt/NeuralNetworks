@@ -1,23 +1,18 @@
 using System.Numerics;
-using NeuralNetworks.Core.Activations;
 using NeuralNetworks.Core.Numerics;
 using NeuralNetworks.Core.Optimizers;
 
 namespace NeuralNetworks.Core.Connections;
 
-public sealed class ActivationConnection<TScalar, TActivation> : IConnection<TScalar>
+public abstract class ElementwiseConnectionBase<TScalar> : IConnection<TScalar>
     where TScalar : struct, INumber<TScalar>
-    where TActivation : IActivation<TScalar>
 {
     public Tensor<TScalar> Input { get; }
     public Tensor<TScalar> Output { get; }
 
-    public ActivationConnection(Tensor<TScalar> input, Tensor<TScalar> output)
+    public ElementwiseConnectionBase(Tensor<TScalar> input, Tensor<TScalar> output)
     {
-        if (input.Shape != output.Shape)
-        {
-            throw new IncompatibleShapeException(nameof(input), nameof(output));
-        }
+        Guard.ShapesAreEqual(input.Shape, output.Shape);
 
         Input = input;
         Output = output;
@@ -30,7 +25,7 @@ public sealed class ActivationConnection<TScalar, TActivation> : IConnection<TSc
 
         if (rank == 0)
         {
-            Output[0] = TActivation.Activate(Input[0]);
+            Output[0] = Calculate(Input[0]);
             return;
         }
 
@@ -41,7 +36,7 @@ public sealed class ActivationConnection<TScalar, TActivation> : IConnection<TSc
 
         while (TensorShape.MoveToNextIndex(lengths, indices))
         {
-            Output[indices] = TActivation.Activate(Input[indices]);
+            Output[indices] = Calculate(Input[indices]);
         }
     }
 
@@ -54,7 +49,7 @@ public sealed class ActivationConnection<TScalar, TActivation> : IConnection<TSc
 
         if (rank == 0)
         {
-            inputGradients[0] = outputGradients[0] * TActivation.Derivate(Input[0]);
+            inputGradients[0] = outputGradients[0] * Derivate(Input[0]);
             return inputGradients;
         }
 
@@ -65,9 +60,12 @@ public sealed class ActivationConnection<TScalar, TActivation> : IConnection<TSc
 
         while (TensorShape.MoveToNextIndex(lengths, indices))
         {
-            inputGradients[indices] = outputGradients[indices] * TActivation.Derivate(Input[indices]);
+            inputGradients[indices] = outputGradients[indices] * Derivate(Input[indices]);
         }
 
         return inputGradients;
     }
+
+    protected abstract TScalar Calculate(TScalar value);
+    protected abstract TScalar Derivate(TScalar value);
 }

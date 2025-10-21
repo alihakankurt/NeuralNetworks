@@ -4,7 +4,7 @@ using NeuralNetworks.Core.Optimizers;
 
 namespace NeuralNetworks.Core.Connections;
 
-public sealed class LinearConnection<TScalar> : IConnection<TScalar>
+public sealed class Dense<TScalar> : IConnection<TScalar>
     where TScalar : struct, INumber<TScalar>
 {
     public Tensor<TScalar> Input { get; }
@@ -12,35 +12,28 @@ public sealed class LinearConnection<TScalar> : IConnection<TScalar>
     public Tensor<TScalar> Weights { get; }
     public Tensor<TScalar> Biases { get; }
 
-    public LinearConnection(Tensor<TScalar> input, Tensor<TScalar> output)
+    public Dense(Tensor<TScalar> input, Tensor<TScalar> output,
+        TScalar minWeight = default, TScalar maxWeight = default,
+        TScalar minBias = default, TScalar maxBias = default)
     {
+        minWeight = (minWeight == default) ? -TScalar.One : minWeight;
+        maxWeight = (maxWeight == default) ? TScalar.One : maxWeight;
+
+        minBias = (minBias == default) ? -TScalar.One : minBias;
+        maxBias = (maxBias == default) ? TScalar.One : maxBias;
+
         TensorShape inputShape = input.Shape;
         TensorShape outputShape = output.Shape;
 
-        if (inputShape.Rank != outputShape.Rank)
-        {
-            throw new IncompatibleShapeException(nameof(input), nameof(output));
-        }
-
-        int rank = inputShape.Rank;
-        ReadOnlySpan<int> inputLengths = inputShape.Lengths;
-        ReadOnlySpan<int> outputLengths = outputShape.Lengths;
-
-        for (int dimension = rank - 2; dimension >= 0; --dimension)
-        {
-            if (inputLengths[dimension] != outputLengths[dimension])
-            {
-                throw new IncompatibleShapeException(nameof(input), nameof(output));
-            }
-        }
+        Guard.ShapesAreEqualExceptLastDimension(inputShape, outputShape);
 
         scoped ReadOnlySpan<int> weightLengths = [];
         scoped ReadOnlySpan<int> biasLengths = [];
 
-        if (rank > 0)
+        if (inputShape.Rank > 0)
         {
-            int inputFeatures = inputLengths[^1];
-            int outputFeatures = outputLengths[^1];
+            int inputFeatures = inputShape.Lengths[^1];
+            int outputFeatures = outputShape.Lengths[^1];
 
             weightLengths = [outputFeatures, inputFeatures];
             biasLengths = [outputFeatures];
@@ -48,11 +41,12 @@ public sealed class LinearConnection<TScalar> : IConnection<TScalar>
 
         Input = input;
         Output = output;
-        Weights = Tensor.Create<TScalar>(weightLengths);
-        Biases = Tensor.Create<TScalar>(outputLengths);
 
-        Weights.Randomize(-TScalar.One, TScalar.One);
-        Biases.Randomize(-TScalar.One, TScalar.One);
+        Weights = Tensor.Create<TScalar>(weightLengths);
+        Weights.Randomize(minWeight, maxWeight);
+
+        Biases = Tensor.Create<TScalar>(biasLengths);
+        Biases.Randomize(minBias, maxBias);
     }
 
     public void Calculate()
@@ -63,7 +57,8 @@ public sealed class LinearConnection<TScalar> : IConnection<TScalar>
 
         if (rank == 0)
         {
-            Output[0] = Input[0] * Weights[0] + Biases[0];
+            ref TScalar outputValue = ref Output[0];
+            outputValue = Input[0] * Weights[0, 0] + Biases[0];
             return;
         }
 
@@ -80,6 +75,7 @@ public sealed class LinearConnection<TScalar> : IConnection<TScalar>
                     TScalar inputValue = Input[inputIndex];
 
                     TScalar weight = Weights[outputIndex, inputIndex];
+
                     weightedSum += inputValue * weight;
                 }
 
@@ -106,6 +102,7 @@ public sealed class LinearConnection<TScalar> : IConnection<TScalar>
                     TScalar inputValue = Input[indices];
 
                     TScalar weight = Weights[outputIndex, inputIndex];
+
                     weightedSum += inputValue * weight;
                 }
 
